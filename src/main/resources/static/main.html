@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마켓플레이스 - 중고거래의 새로운 기준</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.js"></script>
+    <style>
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .backdrop-blur-md {
+            backdrop-filter: blur(12px);
+        }
+        .group:hover .group-hover\:opacity-100 {
+            opacity: 1;
+        }
+        .group:hover .group-hover\:visible {
+            visibility: visible;
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+<!-- Header -->
+<header class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center space-x-4">
+                <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    마켓플레이스
+                </h1>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="hidden md:flex flex-1 max-w-md mx-8 relative">
+                <input
+                        type="text"
+                        id="search-input"
+                        placeholder="어떤 상품을 찾고 계신가요?"
+                        class="w-full pl-10 pr-4 py-2.5 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
+                />
+                <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="flex items-center space-x-2">
+                <button class="relative p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors">
+                    <i data-lucide="bell" class="w-6 h-6"></i>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                </button>
+                <button class="p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors">
+                    <i data-lucide="heart" class="w-6 h-6"></i>
+                </button>
+
+                <!-- User Menu -->
+                <div id="user-menu" class="relative group">
+                    <button id="login-btn" class="p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors">
+                        <i data-lucide="user" class="w-6 h-6"></i>
+                    </button>
+
+                    <!-- Logged in user menu (hidden by default) -->
+                    <div id="user-profile" class="hidden">
+                        <button class="flex items-center space-x-2 p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors">
+                            <div class="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm">
+                                <span id="user-initial">홍</span>
+                            </div>
+                            <span id="user-name" class="hidden sm:block">홍길동</span>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                            <button class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50">내 프로필</button>
+                            <button class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50">판매내역</button>
+                            <button class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50">구매내역</button>
+                            <hr class="my-2">
+                            <button id="logout-btn" class="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-50">
+                                로그아웃
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="ml-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:shadow-lg transition-all flex items-center space-x-2">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <span>판매하기</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Search -->
+    <div class="md:hidden px-4 pb-4">
+        <div class="relative">
+            <input
+                    type="text"
+                    placeholder="어떤 상품을 찾고 계신가요?"
+                    class="w-full pl-10 pr-4 py-2.5 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/80"
+            />
+            <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+        </div>
+    </div>
+</header>
+
+<!-- Mobile Menu Overlay -->
+<div id="mobile-menu" class="lg:hidden fixed inset-0 z-40 bg-black bg-opacity-50 hidden">
+    <div class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg">
+        <div class="p-6 border-b">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold">카테고리</h2>
+                <button id="close-mobile-menu" class="p-1 rounded-full text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+        <nav class="p-4" id="mobile-categories">
+            <!-- Categories will be populated by JavaScript -->
+        </nav>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Sidebar - Categories -->
+        <div class="hidden lg:block w-64 shrink-0">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
+                <h2 class="text-lg font-semibold mb-4 text-gray-900">카테고리</h2>
+                <nav class="space-y-2" id="desktop-categories">
+                    <!-- Categories will be populated by JavaScript -->
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1">
+            <!-- Category Pills & Filter (Mobile) -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="lg:hidden flex-1 overflow-x-auto">
+                    <div class="flex space-x-2 pb-2" id="mobile-category-pills">
+                        <!-- Category pills will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <button id="filter-btn" class="lg:hidden ml-4 p-2 rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50">
+                    <i data-lucide="filter" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Filter Options -->
+            <div id="filter-panel" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 hidden">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <select class="p-2 border border-gray-200 rounded-lg">
+                        <option>가격대</option>
+                        <option>10만원 이하</option>
+                        <option>10-50만원</option>
+                        <option>50만원 이상</option>
+                    </select>
+                    <select class="p-2 border border-gray-200 rounded-lg">
+                        <option>지역</option>
+                        <option>강남구</option>
+                        <option>서초구</option>
+                        <option>송파구</option>
+                    </select>
+                    <select class="p-2 border border-gray-200 rounded-lg">
+                        <option>정렬</option>
+                        <option>최신순</option>
+                        <option>인기순</option>
+                        <option>가격낮은순</option>
+                    </select>
+                    <select class="p-2 border border-gray-200 rounded-lg">
+                        <option>상태</option>
+                        <option>새상품</option>
+                        <option>거의새것</option>
+                        <option>중고</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="flex items-center justify-between mb-6">
+                <h2 id="category-title" class="text-2xl font-bold text-gray-900">전체 상품</h2>
+                <p id="product-count" class="text-gray-500">6개의 상품</p>
+            </div>
+
+            <!-- Product Grid -->
+            <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <!-- Products will be populated by JavaScript -->
+            </div>
+
+            <!-- Load More -->
+            <div class="text-center mt-12">
+                <button class="px-8 py-3 bg-white text-gray-700 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors">
+                    더 많은 상품 보기
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Action Button (Mobile) -->
+<button class="lg:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-all">
+    <i data-lucide="plus" class="w-6 h-6"></i>
+</button>
+
+<!-- 인증 모달 -->
+<div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 hidden">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-fadeIn">
+        <div class="p-8">
+            <!-- 헤더 -->
+            <div class="flex items-center justify-between mb-8">
+                <h2 id="auth-title" class="text-2xl font-bold text-gray-900">로그인</h2>
+                <button id="close-auth-modal" class="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- 소셜 로그인 -->
+            <div class="space-y-3 mb-6">
+                <button class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                    <div class="w-5 h-5 bg-yellow-400 rounded mr-3"></div>
+                    카카오로 <span id="kakao-action">로그인</span>
+                </button>
+                <button class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                    <div class="w-5 h-5 bg-green-500 rounded mr-3"></div>
+                    네이버로 <span id="naver-action">로그인</span>
+                </button>
+                <button class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                    <div class="w-5 h-5 bg-white border rounded mr-3"></div>
+                    구글로 <span id="google-action">로그인</span>
+                </button>
+            </div>
+
+            <!-- 구분선 -->
+            <div class="relative mb-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">또는</span>
+                </div>
+            </div>
+
+            <!-- 폼 -->
+            <form id="auth-form" class="space-y-4">
+                <div id="name-field" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">이름</label>
+                    <input
+                            type="text"
+                            id="name-input"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="홍길동"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+                    <input
+                            type="email"
+                            id="email-input"
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="example@email.com"
+                    />
+                </div>
+
+                <div id="phone-field" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">전화번호</label>
+                    <input
+                            type="tel"
+                            id="phone-input"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="010-1234-5678"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
+                    <input
+                            type="password"
+                            id="password-input"
+                            required
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="8자 이상 입력해주세요"
+                    />
+                </div>
+
+                <div id="confirm-password-field" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호 확인</label>
+                    <input
+                            type="password"
+                            id="confirm-password-input"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="비밀번호를 다시 입력해주세요"
+                    />
+                </div>
+
+                <div id="login-options" class="flex items-center justify-between text-sm">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2 rounded">
+                        <span class="text-gray-600">로그인 상태 유지</span>
+                    </label>
+                    <button type="button" class="text-blue-600 hover:underline">
+                        비밀번호 찾기
+                    </button>
+                </div>
+
+                <div id="signup-agreements" class="space-y-3 hidden">
+                    <label class="flex items-start">
+                        <input type="checkbox" id="agree-terms" class="mr-3 mt-1 rounded">
+                        <span class="text-sm text-gray-600">
+                                <span class="text-red-500">*</span> 이용약관 및 개인정보처리방침에 동의합니다.
+                                <button type="button" class="text-blue-600 hover:underline ml-1">[보기]</button>
+                            </span>
+                    </label>
+                    <label class="flex items-start">
+                        <input type="checkbox" class="mr-3 mt-1 rounded">
+                        <span class="text-sm text-gray-600">
+                                마케팅 정보 수신에 동의합니다. (선택)
+                            </span>
+                    </label>
+                </div>
+
+                <button
+                        type="submit"
+                        id="auth-submit-btn"
+                        class="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all mt-6"
+                >
+                    로그인
+                </button>
+            </form>
+
+            <!-- 하단 링크 -->
+            <div class="mt-6 text-center">
+                <p class="text-gray-600">
+                    <span id="auth-question">계정이 없으신가요?</span>
+                    <button
+                            type="button"
+                            id="toggle-auth-mode"
+                            class="ml-2 text-blue-600 font-semibold hover:underline"
+                    >
+                        회원가입
+                    </button>
+                </p>
+            </div>
+
+            <div id="signup-notice" class="mt-4 p-4 bg-blue-50 rounded-xl hidden">
+                <p class="text-sm text-blue-800">
+                    <strong>안전한 거래를 위해</strong><br>
+                    본인인증이 완료된 사용자만 거래할 수 있습니다.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 데이터 및 상태
+    let isLoggedIn = false;
+    let currentUser = null;
+    let authMode = 'login'; // 'login' or 'signup'
+    let selectedCategory = '전체';
+
+    const categories = ['전체', '디지털/가전', '패션/의류', '뷰티/미용', '스포츠/레저', '도서/티켓', '생활용품', '기타'];
+
+    const products = [
+        {
+            id: 1,
+            title: '아이폰 14 Pro 256GB 딥퍼플',
+            price: 850000,
+            location: '강남구 역삼동',
+            timeAgo: '2시간 전',
+            image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300&h=300&fit=crop',
+            likes: 12,
+            chats: 5,
+            isLiked: false,
+            seller: '김철수',
+            rating: 4.8
+        },
+        {
+            id: 2,
+            title: '맥북 에어 M2 실버 512GB',
+            price: 1200000,
+            location: '서초구 서초동',
+            timeAgo: '1일 전',
+            image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=300&h=300&fit=crop',
+            likes: 28,
+            chats: 12,
+            isLiked: true,
+            seller: '박영희',
+            rating: 4.9
+        },
+        {
+            id: 3,
+            title: '에어팟 프로 2세대',
+            price: 200000,
+            location: '송파구 잠실동',
+            timeAgo: '3시간 전',
+            image: 'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=300&h=300&fit=crop',
+            likes: 7,
+            chats: 3,
+            isLiked: false,
+            seller: '이민수',
+            rating: 4.7
+        },
+        {
+            id: 4,
+            title: '닌텐도 스위치 OLED 화이트',
+            price: 280000,
+            location: '마포구 홍대입구',
+            timeAgo: '5시간 전',
+            image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=300&fit=crop',
+            likes: 15,
+            chats: 8,
+            isLiked: false,
+            seller: '정수현',
+            rating: 4.6
+        },
+        {
+            id: 5,
+            title: '다이슨 에어랩 스타일러',
+            price: 450000,
+            location: '용산구 이태원동',
+            timeAgo: '1일 전',
+            image: 'https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=300&h=300&fit=crop',
+            likes: 22,
+            chats: 14,
+            isLiked: true,
+            seller: '최지영',
+            rating: 4.8
+        },
+        {
+            id: 6,
+            title: '삼성 갤럭시 탭 S9 11인치',
+            price: 650000,
+            location: '강서구 화곡동',
+            timeAgo: '6시간 전',
+            image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300&h=300&fit=crop',
+            likes: 9,
+            chats: 4,
+            isLiked: false,
+            seller: '한지민',
+            rating: 4.5
+        }
+    ];
+
+    // 유틸리티 함수
+    function formatPrice(price) {
+        return price.toLocaleString('ko-KR') + '원';
+    }
+
+    function createProductCard(product) {
+        return `
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <div class="relative">
+                        <img src="${product.image}" alt="${product.title}" class="w-full h-48 object-cover">
+                        <button class="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+            product.isLiked ? 'bg-red-500 text-white' : 'bg-white/80 text-gray-600 hover:bg-white'
+        }" onclick="toggleLike(${product.id})">
+                            <i data-lucide="heart" class="w-4 h-4 ${product.isLiked ? 'fill-current' : ''}"></i>
+                        </button>
+                        <div class="absolute bottom-3 left-3 flex items-center space-x-1 bg-black/50 text-white px-2 py-1 rounded-full text-xs">
+                            <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                            <span>${product.rating}</span>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">${product.title}</h3>
+                        <div class="text-xl font-bold text-blue-600 mb-3">${formatPrice(product.price)}</div>
+                        <div class="flex items-center text-sm text-gray-500 mb-2">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 mr-1"></i>
+                            ${product.location}
+                        </div>
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+                            <div class="flex items-center">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 mr-1"></i>
+                                ${product.timeAgo}
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="flex items-center">
+                                    <i data-lucide="heart" class="w-3.5 h-3.5 mr-1"></i>
+                                    ${product.likes}
+                                </span>
+                                <span class="flex items-center">
+                                    <i data-lucide="message-circle" class="w-3.5 h-3.5 mr-1"></i>
+                                    ${product.chats}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+                            <div class="flex items-center text-sm text-gray-600">
+                                <div class="w-6 h-6 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs mr-2">
+                                    ${product.seller[0]}
+                                </div>
+                                ${product.seller}
+                            </div>
+                            <button class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm rounded-full hover:shadow-lg transition-all">
+                                채팅하기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+    }
+
+    function renderProducts() {
+        const productGrid = document.getElementById('product-grid');
+        productGrid.innerHTML = products.map(product => createProductCard(product)).join('');
+        lucide.createIcons();
+    }
+
+    function renderCategories() {
+        const desktopCategories = document.getElementById('desktop-categories');
+        const mobileCategories = document.getElementById('mobile-categories');
+        const mobileCategoryPills = document.getElementById('mobile-category-pills');
+
+        const categoryHTML = categories.map(category => `
+                <button class="category-btn block w-full text-left py-2.5 px-4 rounded-xl transition-all ${
+            selectedCategory === category
+                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg'
+                : 'text-gray-700 hover:bg-gray-50'
+        }" data-category="${category}">
+                    ${category}
+                </button>
+            `).join('');
+
+        const mobilePillHTML = categories.slice(0, 5).map(category => `
+                <button class="category-pill whitespace-nowrap px-4 py-2 rounded-full text-sm transition-all ${
+            selectedCategory === category
+                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
+                : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
+        }" data-category="${category}">
+                    ${category}
+                </button>
+            `).join('');
+
+        desktopCategories.innerHTML = categoryHTML;
+        mobileCategories.innerHTML = categoryHTML;
+        mobileCategoryPills.innerHTML = mobilePillHTML;
+    }
